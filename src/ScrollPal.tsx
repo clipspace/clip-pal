@@ -384,14 +384,21 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     setBubSize({ w: el.offsetWidth + 2, h: el.offsetHeight + 2 }); // +2 for the border
   }, [typing, line, bubbleW, palW, arrivalId]);
 
+  // Below the breakpoint he is display:none — and nothing else runs either:
+  // no rAF loop, no listeners, no re-measuring, on every phone that opens
+  // the page. The loop effect below is keyed on this.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (p.current.stops.length === 0) return;
-
     const mq = window.matchMedia(`(min-width: ${minViewport}px)`);
     const onMq = () => setWide(mq.matches);
     onMq();
     mq.addEventListener("change", onMq);
+    return () => mq.removeEventListener("change", onMq);
+  }, [minViewport]);
+
+  useEffect(() => {
+    if (!wide) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (p.current.stops.length === 0) return;
 
     // The content column's width and the root font size can both change
     // across breakpoints, so read them each time rather than caching.
@@ -667,7 +674,6 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
       clearTimeout(idleTimer);
       clearTimeout(t.emote);
       clearTimeout(t.emoteEnd);
-      mq.removeEventListener("change", onMq);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", computeTarget);
       window.removeEventListener("mousemove", activity);
@@ -678,7 +684,7 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    minViewport,
+    wide,
     contentWidth,
     contentVar,
     minWidth,
