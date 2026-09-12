@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>clip-pal demo</title>
+    <style>
+      :root { --content-w: 60rem; }
+      html { color-scheme: dark; }
+      body {
+        margin: 0;
+        background: #131f1a;
+        color: #f2ede0;
+        font: 15px/1.6 system-ui, sans-serif;
+      }
+      main { max-width: var(--content-w); margin: 0 auto; padding: 0 1.5rem; }
+      section { padding: 6rem 0; border-bottom: 1px solid rgba(242,237,224,.1); }
+      h1, h2 { font-weight: 700; }
+      .grid { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+      button {
+        background: #1b2a23; color: #f2ede0; border: 1px solid rgba(242,237,224,.15);
+        border-radius: 999px; padding: .4rem .9rem; cursor: pointer; font: inherit;
+      }
+      button.on { border-color: #d9a441; color: #d9a441; }
+      .stage { display: flex; gap: 3rem; align-items: flex-end; margin-top: 2rem; }
+      .stage > div { padding: 1rem; border: 1px dashed rgba(242,237,224,.12); border-radius: 12px; }
+      code { color: #d9a441; }
+      .muted { color: #9daa9f; }
+      .panel { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; margin: 1rem 0; font-size: 13px; color: #9daa9f; }
+      .panel label { display: flex; flex-direction: column; gap: .25rem; }
+      .panel select, .panel input[type=color] { background: #1b2a23; color: #f2ede0; border: 1px solid rgba(242,237,224,.15); border-radius: 6px; padding: .2rem .4rem; }
+      .hoverable { border-bottom: 1px dashed #d9a441; cursor: help; color: #f2ede0; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

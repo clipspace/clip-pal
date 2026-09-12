@@ -1,0 +1,67 @@
+{
+  "name": "clip-pal",
+  "version": "0.1.0",
+  "description": "A one-legged paperclip who walks along as you scroll, keeps you company and acts out what he says. The ClipSpace mascot, as a React component.",
+  "keywords": [
+    "react",
+    "mascot",
+    "paperclip",
+    "animation",
+    "scroll",
+    "companion",
+    "clipspace",
+    "svg"
+  ],
+  "homepage": "https://github.com/clipspace/clip-pal#readme",
+  "bugs": "https://github.com/clipspace/clip-pal/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clipspace/clip-pal.git"
+  },
+  "license": "MIT",
+  "author": "Jáchym Šolta <jachym@djt-group.com> (https://jachym.djt-group.com)",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup && cp src/styles.css dist/styles.css",
+    "typecheck": "tsc --noEmit",
+    "demo": "vite",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.1.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5",
+    "vite": "^8.3.0"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true
+  }
+}
