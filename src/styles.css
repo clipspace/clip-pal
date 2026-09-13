@@ -340,17 +340,19 @@
 /* a good long look left, a beat, then right */
 @keyframes pal-look-eyes {
   0% { transform: translateX(0); }
-  14%, 34% { transform: translateX(-2.4px); }
+  14%, 34% { transform: translateX(-3.6px); }
   46% { transform: translateX(0); }
-  58%, 80% { transform: translateX(2.4px); }
+  58%, 80% { transform: translateX(3.6px); }
   92%, 100% { transform: translateX(0); }
 }
+/* the whole clip turns toward each side — a real turn in perspective, with a
+   little lean into it — rather than a tilt you could miss */
 @keyframes pal-look-tilt {
-  0% { transform: rotate(0deg); }
-  20%, 34% { transform: rotate(-5deg); }
-  46% { transform: rotate(0deg); }
-  64%, 80% { transform: rotate(5deg); }
-  92%, 100% { transform: rotate(0deg); }
+  0% { transform: perspective(190px) rotateY(0deg) rotate(0deg); }
+  20%, 34% { transform: perspective(190px) rotateY(-34deg) rotate(-6deg); }
+  46% { transform: perspective(190px) rotateY(0deg) rotate(0deg); }
+  64%, 80% { transform: perspective(190px) rotateY(34deg) rotate(6deg); }
+  92%, 100% { transform: perspective(190px) rotateY(0deg) rotate(0deg); }
 }
 
 /* Steps up closer to say something and stays there while the line is read.
@@ -360,6 +362,11 @@
   0%, 100% { transform: scale(1) translateY(0); }
   16%, 84% { transform: scale(1.16) translateY(-3px); }
 }
+/* ...and the eyes go wide, the way a face does when it comes in close */
+@keyframes pal-lean-eyes {
+  0%, 100% { transform: scale(1); }
+  16%, 84% { transform: scale(1.4); }
+}
 
 /* A decaying bounce: hops, each lower than the last, then he stands still.
    The squash and stretch are inverse on the two axes so his volume looks
@@ -367,11 +374,11 @@
 @keyframes pal-bounce {
   0% { transform: translateY(0) scale(1, 1); }
   9% { transform: translateY(0) scale(1.1, 0.88); }
-  25% { transform: translateY(-16px) scale(0.94, 1.08); }
+  25% { transform: translateY(-34px) scale(0.94, 1.08); }
   40% { transform: translateY(0) scale(1.08, 0.92); }
-  52% { transform: translateY(-10px) scale(0.96, 1.05); }
+  52% { transform: translateY(-20px) scale(0.96, 1.05); }
   64% { transform: translateY(0) scale(1.06, 0.94); }
-  73% { transform: translateY(-5px) scale(0.98, 1.03); }
+  73% { transform: translateY(-9px) scale(0.98, 1.03); }
   82% { transform: translateY(0) scale(1.03, 0.97); }
   90%, 100% { transform: translateY(0) scale(1, 1); }
 }
@@ -555,25 +562,27 @@
 }
 
 /* yes */
+/* yes — the top tips toward you and back, twice, from the foot */
 @keyframes pal-nod {
-  0% { transform: translateY(0) scaleY(1); }
-  18% { transform: translateY(4px) scaleY(0.93); }
-  36% { transform: translateY(0) scaleY(1); }
-  54% { transform: translateY(4px) scaleY(0.93); }
-  72% { transform: translateY(0) scaleY(1); }
-  86% { transform: translateY(2px) scaleY(0.96); }
-  100% { transform: translateY(0) scaleY(1); }
+  0% { transform: perspective(320px) rotateX(0deg) translateY(0); }
+  18% { transform: perspective(320px) rotateX(-22deg) translateY(2px); }
+  36% { transform: perspective(320px) rotateX(3deg) translateY(0); }
+  54% { transform: perspective(320px) rotateX(-22deg) translateY(2px); }
+  72% { transform: perspective(320px) rotateX(3deg) translateY(0); }
+  86% { transform: perspective(320px) rotateX(-9deg) translateY(1px); }
+  100% { transform: perspective(320px) rotateX(0deg) translateY(0); }
 }
 
 /* no */
+/* no — turns side to side about his own axis */
 @keyframes pal-shake {
-  0% { transform: rotate(0deg); }
-  14% { transform: rotate(-8deg); }
-  30% { transform: rotate(8deg); }
-  46% { transform: rotate(-7deg); }
-  62% { transform: rotate(6deg); }
-  78% { transform: rotate(-3deg); }
-  100% { transform: rotate(0deg); }
+  0% { transform: perspective(190px) rotateY(0deg); }
+  14% { transform: perspective(190px) rotateY(-40deg); }
+  30% { transform: perspective(190px) rotateY(40deg); }
+  46% { transform: perspective(190px) rotateY(-34deg); }
+  62% { transform: perspective(190px) rotateY(28deg); }
+  78% { transform: perspective(190px) rotateY(-14deg); }
+  100% { transform: perspective(190px) rotateY(0deg); }
 }
 
 /* Sways from side to side — hips, bob, squash and a glance on each beat, not
@@ -616,7 +625,7 @@
   opacity: 0;
   transform-box: view-box;
 }
-.pal-ball { transform-origin: 42px 71px; }
+.pal-ball { transform-origin: 44px 71px; }
 .pal-crack { transform-origin: 42px 30px; }
 .pal-tap { transform-origin: 45px 45px; }
 
@@ -626,8 +635,6 @@
 .pal-em-hop,
 .pal-em-knock,
 .pal-em-wave,
-.pal-em-nod,
-.pal-em-shake,
 .pal-em-dance,
 .pal-em-kick,
 .pal-em-crack,
@@ -641,6 +648,7 @@
 .pal-em-look .pal-eye { animation: pal-look-eyes calc(var(--_pal-tempo) * 3.2s) ease-in-out both; }
 
 .pal-em-lean { animation: pal-lean calc(var(--_pal-tempo) * 4s) ease-in-out both; }
+.pal-em-lean .pal-eye { animation: pal-lean-eyes calc(var(--_pal-tempo) * 4s) ease-in-out both; }
 .pal-em-hop { animation: pal-bounce calc(var(--_pal-tempo) * 2.2s) ease-out both; }
 
 .pal-em-knock { animation: pal-knock calc(var(--_pal-tempo) * 3.4s) ease-in-out both; }
@@ -670,8 +678,14 @@
     pal-wave-leg calc(var(--_pal-tempo) * 2.4s) ease-in-out both;
 }
 
-.pal-em-nod { animation: pal-nod calc(var(--_pal-tempo) * 1.6s) ease-in-out both; }
-.pal-em-shake { animation: pal-shake calc(var(--_pal-tempo) * 1.6s) ease-in-out both; }
+.pal-em-nod {
+  animation: pal-nod calc(var(--_pal-tempo) * 1.6s) ease-in-out both;
+  transform-origin: 50% 72%;
+}
+.pal-em-shake {
+  animation: pal-shake calc(var(--_pal-tempo) * 1.6s) ease-in-out both;
+  transform-origin: 50% 50%;
+}
 
 .pal-em-dance { animation: pal-dance calc(var(--_pal-tempo) * 3s) ease-in-out both; }
 .pal-em-dance .pal-leg { animation: pal-dance-leg calc(var(--_pal-tempo) * 3s) ease-in-out both; }

@@ -145,6 +145,9 @@ export default function PalSvg({
           the leg, which is why the kick never read. Solid with a dark panel; a
           bare ring looked like a hoop. */}
       <g className="pal-ball">
+        {/* nudged right and a touch smaller so it sits beside the foot
+            rather than on the shin while he keeps it up */}
+        <g transform="translate(44 71) scale(0.85) translate(-42 -71)">
         <circle cx="42" cy="71" r="6.6" style={face} />
         <path d="M42 68 L44.8 70 L43.7 73.4 L40.3 73.4 L39.2 70 Z" style={ink} />
         <path
@@ -153,6 +156,7 @@ export default function PalSvg({
           strokeWidth="1"
           fill="none"
         />
+        </g>
       </g>
 
       {/* Sleep bubbles: three dots that drift up from his head while he dozes,
