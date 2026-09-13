@@ -179,6 +179,13 @@
   animation: pal-blink var(--_pal-blink-ms) ease-in-out infinite;
 }
 
+/* the eyes turn toward whatever text field has focus (gaze.ts) */
+.pal-gaze {
+  transform-box: view-box;
+  transform: translate(var(--pal-gaze-x, 0px), var(--pal-gaze-y, 0px));
+  transition: transform 0.22s ease-out;
+}
+
 /* the leg itself steps: it pivots at the hip (15,63 in viewBox units),
    swinging back and forth while the pal is on the move */
 .pal-leg {

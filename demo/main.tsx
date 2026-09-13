@@ -212,11 +212,20 @@ function App() {
       <section id="s3">
         <h2 id="a3">The standing companion</h2>
         <div style={{ display: "flex", gap: "3rem", alignItems: "center", marginTop: "3rem" }}>
-          <PalCompanion width={90} lines={LINES} showMs={6000} gapMs={4000} />
-          <p className="muted">
-            He speaks now and then while he is on screen, and acts out what
-            he says.
-          </p>
+          <PalCompanion
+            width={90}
+            lines={LINES}
+            showMs={6000}
+            gapMs={4000}
+            watchLines={[["i'm not reading. okay, i'm reading a bit.", "look"]]}
+          />
+          <div className="muted">
+            <p>
+              He speaks now and then while he is on screen, and acts out what
+              he says. And he watches you type:
+            </p>
+            <input id="demo-input" placeholder="type something…" style={{ width: "16rem" }} />
+          </div>
         </div>
         <div style={{ height: "40vh" }} />
       </section>

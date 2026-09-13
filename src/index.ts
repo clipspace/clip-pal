@@ -7,6 +7,7 @@ export type { ScrollPalProps, ScrollPalHandle } from "./ScrollPal";
 export { Bubble } from "./Bubble";
 export type { BubbleProps } from "./Bubble";
 export { useHoverSay, HOVER_ATTR, HOVER_EMOTE_ATTR } from "./hover";
+export { useGaze, isTextField } from "./gaze";
 export type { HoverLine } from "./hover";
 export {
   PAL_GESTURES,

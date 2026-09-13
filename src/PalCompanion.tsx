@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { Bubble } from "./Bubble";
+import { useGaze } from "./gaze";
 import { useHoverSay } from "./hover";
 import PalSvg from "./PalSvg";
 import {
@@ -65,6 +66,10 @@ export type PalCompanionProps = {
   hover?: boolean;
   /** minimum gap between two hover lines, ms (default 1 200) */
   hoverCooldownMs?: number;
+  /** look at the text field being typed into (default true) */
+  watch?: boolean;
+  /** something to say when a text field gets focus (one at random, once per focus) */
+  watchLines?: readonly PalLine[];
   /** the gentle up-and-down float (default true) */
   float?: boolean;
   /** the idle sway (default true) */
@@ -106,6 +111,8 @@ const PalCompanion = forwardRef<PalCompanionHandle, PalCompanionProps>(
       emotes = true,
       hover = true,
       hoverCooldownMs = 1200,
+      watch = true,
+      watchLines,
       float = true,
       sway = true,
       visibleThreshold = 0.4,
@@ -299,6 +306,20 @@ const PalCompanion = forwardRef<PalCompanionHandle, PalCompanionProps>(
         schedule(p.current.gapMs);
       },
     }));
+
+    const watchRef = useRef(watchLines);
+    watchRef.current = watchLines;
+    useGaze(
+      rootRef,
+      watch,
+      () => 1,
+      () => {
+        const lines = watchRef.current;
+        if (!lines?.length || !onScreen.current) return;
+        const [text, acts] = lines[Math.floor(Math.random() * lines.length)];
+        interrupt(text, acts);
+      },
+    );
 
     useHoverSay(hover, hoverCooldownMs, ({ text, emote: e }) => {
       if (!onScreen.current) return;

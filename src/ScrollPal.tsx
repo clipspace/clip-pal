@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { Bubble } from "./Bubble";
+import { useGaze } from "./gaze";
 import { useHoverSay } from "./hover";
 import PalSvg from "./PalSvg";
 import {
@@ -131,6 +132,10 @@ export type ScrollPalProps = {
   hoverCooldownMs?: number;
   /** let visitors pick him up and drop him (default true) */
   draggable?: boolean;
+  /** look at the text field being typed into (default true) */
+  watch?: boolean;
+  /** something to say when a text field gets focus (one at random, once per focus) */
+  watchLines?: readonly PalLine[];
 
   /** a preset name or your own wire */
   shape?: PalShapeName | PalShape;
@@ -188,6 +193,8 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     hover = true,
     hoverCooldownMs = 1200,
     draggable = true,
+    watch = true,
+    watchLines,
     shape,
     strokeWidth,
     eyes,
@@ -369,6 +376,22 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     hush: hushNow,
     current: () => nearRef.current.id,
   }));
+
+  // he looks at the field being typed into, and may have something to say
+  // about it — once per focus, and never while walking
+  const watchRef = useRef(watchLines);
+  watchRef.current = watchLines;
+  useGaze(
+    wrapRef,
+    watch && wide && roomy,
+    () => cur.current.facing,
+    () => {
+      const lines = watchRef.current;
+      if (!lines?.length || isWalkingRef.current) return;
+      const [text, acts] = lines[Math.floor(Math.random() * lines.length)];
+      sayNow(text, acts);
+    },
+  );
 
   // hover comments: only while he is standing still and on screen
   useHoverSay(hover && wide && roomy, hoverCooldownMs, ({ text, emote: e }) => {

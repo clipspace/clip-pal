@@ -103,6 +103,7 @@ ClipSpace site was tuned with.
 | `emotes` | true | false = never acts out; or a whitelist array |
 | `hover` / `hoverCooldownMs` | true / 1200 | react to `data-pal-say` elements |
 | `draggable` | true | |
+| `watch` / `watchLines` | true / — | look at the focused text field; lines to say when one gets focus |
 | `shape` | `"gem"` | `"round"`, `"square"`, `"long"` or a `PalShape` |
 | `strokeWidth` | 5 | wire thickness |
 | `eyes` | `"dots"` | `"none"` |
@@ -114,7 +115,7 @@ ClipSpace site was tuned with.
 `PalCompanion`: `lines` (required), `width` (90), `height`, `showMs`
 (10000), `gapMs` (20000), `firstMs` (1500), `typingMs`, `emoteDelayMs`,
 `bubbleMaxWidth` ("15rem"), `random`, `speak`, `emotes`, `hover`,
-`hoverCooldownMs`, `float` (true), `sway` (true), `visibleThreshold` (0.4),
+`hoverCooldownMs`, `watch`, `watchLines`, `float` (true), `sway` (true), `visibleThreshold` (0.4),
 `shape`, `strokeWidth`, `eyes`, `colors`, `motion`, `onSpeak`.
 
 `PalSvg`: the bare drawing — `width`, `height`, `walking`, `emote`,
@@ -132,6 +133,17 @@ const pal = useRef<ScrollPalHandle>(null);
 pal.current?.say("you clicked the thing.", "nod");
 pal.current?.emote("backflip");
 pal.current?.hush();
+```
+
+### He watches you type
+
+Focus any text field and his eyes turn toward it; every keystroke gives
+them a flick, like he is reading along. On by default (`watch={false}`
+turns it off). Give him `watchLines` and he also says one of them when a
+field gets focus:
+
+```tsx
+<ScrollPal stops={STOPS} watchLines={[["i'm not reading. okay, a bit.", "look"]]} />
 ```
 
 ### Hover comments

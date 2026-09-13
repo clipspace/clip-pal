@@ -128,10 +128,16 @@ export default function PalSvg({
           style={{ transformOrigin: `${sh.hip[0]}px ${sh.hip[1]}px` }}
         />
       </g>
-      {eyes === "dots" &&
-        sh.eyes.map((e, i) => (
-          <circle key={i} className="pal-eye" cx={e.cx} cy={e.cy} r={e.r} style={face} />
-        ))}
+      {/* The eyes sit in a group that follows the gaze variables (see
+          gaze.ts) — so they can look at a text field while every emote
+          and the blink keep animating the circles themselves. */}
+      {eyes === "dots" && (
+        <g className="pal-gaze">
+          {sh.eyes.map((e, i) => (
+            <circle key={i} className="pal-eye" cx={e.cx} cy={e.cy} r={e.r} style={face} />
+          ))}
+        </g>
+      )}
 
       {/* Impact rings where his fingertip meets the glass. Without these a tap
           toward the viewer has no direction to move in and just reads as
