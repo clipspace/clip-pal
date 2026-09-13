@@ -136,6 +136,15 @@ export type ScrollPalProps = {
   watch?: boolean;
   /** something to say when a text field gets focus (one at random, once per focus) */
   watchLines?: readonly PalLine[];
+  /**
+   * Walk over to whatever is hovered or being typed into — he parks in the
+   * gutter nearest it, at its height — instead of commenting from across
+   * the page (default true). He goes back to his stop when the field loses
+   * focus, or `approachStayMs` after a hover.
+   */
+  approach?: boolean;
+  /** how long he stays by a hovered element, ms (default 5 000) */
+  approachStayMs?: number;
 
   /** a preset name or your own wire */
   shape?: PalShapeName | PalShape;
@@ -195,6 +204,8 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     draggable = true,
     watch = true,
     watchLines,
+    approach = true,
+    approachStayMs = 5000,
     shape,
     strokeWidth,
     eyes,
@@ -248,6 +259,15 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
   // the line last played at each stop, so a random pick can avoid repeating it
   const lineIdx = useRef<Record<string, number>>({});
   const isWalkingRef = useRef(false);
+  // a detour: the element he is walking over to look at, and for how long.
+  // While it is set, computeTarget parks him in the gutter nearest to it at
+  // its height instead of at his stop.
+  const visit = useRef<{ el: Element; until: number } | null>(null);
+  // a line to say once he gets there (saying it before the walk would just
+  // get the bubble put away when he sets off)
+  const pending = useRef<readonly [string, PalEmote | null] | null>(null);
+  const approachRef = useRef({ approach, approachStayMs });
+  approachRef.current = { approach, approachStayMs };
 
   // props the animation loop reads — kept in refs so the loop is set up once
   const p = useRef({
@@ -348,6 +368,19 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     setBubbleOn(false);
   };
 
+  // Walk over to `el` and say `line` on arrival; or, without approach, just
+  // say it from here. Focus visits last until blur (Infinity); hover visits
+  // for approachStayMs.
+  const goSee = (el: Element, line: readonly [string, PalEmote | null] | null, ms: number) => {
+    if (!approachRef.current.approach) {
+      if (line) sayNow(line[0], line[1]);
+      return;
+    }
+    visit.current = { el, until: ms === Infinity ? Infinity : performance.now() + ms };
+    dropped.current = false;
+    pending.current = line;
+  };
+
   useImperativeHandle(ref, () => ({
     say: (text, e = null) => sayNow(text, e),
     emote: (name) => {
@@ -385,18 +418,22 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     wrapRef,
     watch && wide && roomy,
     () => cur.current.facing,
-    () => {
+    (field) => {
       const lines = watchRef.current;
-      if (!lines?.length || isWalkingRef.current) return;
-      const [text, acts] = lines[Math.floor(Math.random() * lines.length)];
-      sayNow(text, acts);
+      const line = lines?.length
+        ? lines[Math.floor(Math.random() * lines.length)]
+        : null;
+      goSee(field, line, Infinity);
+    },
+    (field) => {
+      if (visit.current?.el === field) visit.current = null;
     },
   );
 
   // hover comments: only while he is standing still and on screen
-  useHoverSay(hover && wide && roomy, hoverCooldownMs, ({ text, emote: e }) => {
-    if (isWalkingRef.current || dragging.current) return;
-    sayNow(text, e);
+  useHoverSay(hover && wide && roomy, hoverCooldownMs, ({ text, emote: e, el }) => {
+    if (dragging.current) return;
+    goSee(el, [text, e], approachRef.current.approachStayMs);
   });
 
   // measure the bubble's content so the box itself can smoothly grow from
@@ -501,6 +538,24 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
       if (atBottom) near = all[all.length - 1];
 
       const pw = palWRef.current;
+
+      // a detour takes precedence: the gutter nearest the element, at its
+      // height, until the visit runs out or the element is gone
+      const v = visit.current;
+      if (v && (!v.el.isConnected || performance.now() > v.until)) visit.current = null;
+      if (visit.current) {
+        const r = visit.current.el.getBoundingClientRect();
+        const onLeft = r.left + r.width / 2 < window.innerWidth / 2;
+        const x = onLeft ? parkLeft() : parkRight();
+        const yLimit = h / 2 - yLimitPad;
+        const y = Math.max(-yLimit, Math.min(yLimit, r.top + Math.min(r.height / 2, 60) - vc + offsetY));
+        target.current = { x, y };
+        nearRef.current = near;
+        setLeftGutter(onLeft);
+        fitBubble(x, onLeft);
+        return;
+      }
+
       const a = document.getElementById(near.anchor)?.getBoundingClientRect();
 
       // where he stands: next to his anchor element, or in a gutter beside it
@@ -637,9 +692,17 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
           shownStop = null;
         }
       }
+      // arrived at a detour: say what he came to say, and count the stop as
+      // announced so the stop line doesn't fire on top of it
+      if (!isWalking && pending.current) {
+        const [text, acts] = pending.current;
+        pending.current = null;
+        shownStop = nearRef.current.id;
+        sayNow(text, acts);
+      }
       // speak whenever he's standing at a stop he hasn't announced yet —
       // this also covers two same-side stops, where there's no walk at all
-      if (!isWalking && shownStop !== nearRef.current.id) {
+      if (!isWalking && !visit.current && shownStop !== nearRef.current.id) {
         const s = nearRef.current;
         shownStop = s.id;
         p.current.onArrive?.(s.id);

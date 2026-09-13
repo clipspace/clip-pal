@@ -104,6 +104,7 @@ ClipSpace site was tuned with.
 | `hover` / `hoverCooldownMs` | true / 1200 | react to `data-pal-say` elements |
 | `draggable` | true | |
 | `watch` / `watchLines` | true / — | look at the focused text field; lines to say when one gets focus |
+| `approach` / `approachStayMs` | true / 5000 | walk over to hovered/focused things; how long he stays after a hover |
 | `shape` | `"gem"` | `"round"`, `"square"`, `"long"` or a `PalShape` |
 | `strokeWidth` | 5 | wire thickness |
 | `eyes` | `"dots"` | `"none"` |
@@ -134,6 +135,14 @@ pal.current?.say("you clicked the thing.", "nod");
 pal.current?.emote("backflip");
 pal.current?.hush();
 ```
+
+### He comes over
+
+Hover something with `data-pal-say`, or focus a text field, and the
+walking guide walks over — he parks in the gutter nearest to it, at its
+height — and says his line there, instead of shouting from the other side
+of the page. He goes back to his stop when the field loses focus, or
+`approachStayMs` (5 s) after a hover. `approach={false}` keeps him put.
 
 ### He watches you type
 

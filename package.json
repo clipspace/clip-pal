@@ -1,6 +1,6 @@
 {
   "name": "clip-pal",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A one-legged paperclip who walks along as you scroll, keeps you company and acts out what he says. The ClipSpace mascot, as a React component.",
   "keywords": [
     "react",

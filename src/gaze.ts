@@ -25,9 +25,12 @@ export function useGaze(
   /** 1 or -1: the pal is mirrored, so sideways gaze must flip too */
   facing: () => 1 | -1,
   onFocus?: (field: HTMLElement) => void,
+  onBlur?: (field: HTMLElement) => void,
 ) {
   const cb = useRef(onFocus);
   cb.current = onFocus;
+  const cbBlur = useRef(onBlur);
+  cbBlur.current = onBlur;
   const face = useRef(facing);
   face.current = facing;
 
@@ -73,9 +76,11 @@ export function useGaze(
       cb.current?.(field);
     };
     const onFocusOut = (e: FocusEvent) => {
-      if (e.target !== field) return;
+      if (!field || e.target !== field) return;
+      const was = field;
       field = null;
       clear();
+      cbBlur.current?.(was);
     };
     // a keystroke: the eyes flick a little, as if following the caret
     const onInput = (e: Event) => {
