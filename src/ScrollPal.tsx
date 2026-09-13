@@ -256,6 +256,10 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
   // him entirely than to have him stand on top of the text
   const [roomy, setRoomy] = useState(false);
   const [wide, setWide] = useState(false);
+  // the bubble sits above his head — unless his head is so close to the top
+  // of the screen that it would be cut off, then it hangs below him
+  const [below, setBelow] = useState(false);
+  const belowRef = useRef(false);
   // the line last played at each stop, so a random pick can avoid repeating it
   const lineIdx = useRef<Record<string, number>>({});
   const isWalkingRef = useRef(false);
@@ -268,6 +272,9 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
   const pending = useRef<readonly [string, PalEmote | null] | null>(null);
   const approachRef = useRef({ approach, approachStayMs });
   approachRef.current = { approach, approachStayMs };
+  // the loop's computeTarget, so a detour can retarget at once rather than
+  // waiting for the next re-measure (he would say the line, then set off)
+  const retarget = useRef<() => void>(() => {});
 
   // props the animation loop reads — kept in refs so the loop is set up once
   const p = useRef({
@@ -379,6 +386,7 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
     visit.current = { el, until: ms === Infinity ? Infinity : performance.now() + ms };
     dropped.current = false;
     pending.current = line;
+    retarget.current();
   };
 
   useImperativeHandle(ref, () => ({
@@ -580,6 +588,8 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
       fitBubble(x, onLeft);
     };
 
+    retarget.current = computeTarget;
+
     let idleTimer: ReturnType<typeof setTimeout> | undefined;
 
     // pick a resting spot on the far side of the screen from where he stands,
@@ -692,9 +702,12 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
           shownStop = null;
         }
       }
-      // arrived at a detour: say what he came to say, and count the stop as
-      // announced so the stop line doesn't fire on top of it
-      if (!isWalking && pending.current) {
+      // arrived at a detour — actually there, not just slowed down on the
+      // way: say what he came to say, and count the stop as announced so
+      // the stop line doesn't fire on top of it
+      const there =
+        Math.abs(target.current.x - c.x) < 3 && Math.abs(target.current.y - c.y) < 3;
+      if (!isWalking && there && pending.current) {
         const [text, acts] = pending.current;
         pending.current = null;
         shownStop = nearRef.current.id;
@@ -726,6 +739,14 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
 
       if (wrapRef.current) {
         wrapRef.current.style.transform = `translate(${c.x}px, calc(-50% + ${c.y}px))`;
+        // his top edge, in viewport px; a bubble needs ~110px above it.
+        // Two thresholds so it doesn't flip back and forth on the line.
+        const top = window.innerHeight / 2 + c.y - wrapRef.current.offsetHeight / 2;
+        const want = belowRef.current ? top < 140 : top < 110;
+        if (want !== belowRef.current) {
+          belowRef.current = want;
+          setBelow(want);
+        }
       }
       if (palRef.current) {
         // rotate first (screen space) so the lean isn't mirrored by the flip
@@ -839,12 +860,13 @@ const ScrollPal = forwardRef<ScrollPalHandle, ScrollPalProps>(function ScrollPal
             remount), then holds the line until he walks off */}
         {speak && (
           <div
-            className="clip-pal-bubble-wrap"
+            className={`clip-pal-bubble-wrap${below ? " is-below" : ""}`}
             style={leftGutter ? { right: 0 } : { left: 0 }}
           >
             <div key={arrivalId}>
               <Bubble
                 side={bubbleSide}
+                below={below}
                 hidden={!bubbleOn}
                 typing={typing}
                 line={line}

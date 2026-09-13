@@ -8,6 +8,8 @@ import type { CSSProperties, ReactNode } from "react";
 export type BubbleProps = {
   /** which way the bubble grows — the side its tail is on */
   side: "left" | "right" | "center";
+  /** hang under him instead of over his head (tail on top) */
+  below?: boolean;
   hidden: boolean;
   typing: boolean;
   line: string;
@@ -22,6 +24,7 @@ export type BubbleProps = {
 
 export function Bubble({
   side,
+  below = false,
   hidden,
   typing,
   line,
@@ -38,7 +41,7 @@ export function Bubble({
         : undefined;
   return (
     <div
-      className={`clip-pal-bubble is-${side} ${hidden ? "pal-bubble-hide" : "pal-say"}`}
+      className={`clip-pal-bubble is-${side}${below ? " is-below" : ""} ${hidden ? "pal-bubble-hide" : "pal-say"}`}
     >
       <div
         className="clip-pal-bubble-box"

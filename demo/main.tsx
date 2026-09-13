@@ -176,7 +176,7 @@ function App() {
   return (
     <main>
       <section id="s1">
-        <h1 id="a1">clip-pal</h1>
+        <h1 id="a1" data-pal-say="that's my name. don't wear it out." data-pal-emote="bow">clip-pal</h1>
         <p>
           A one-legged paperclip. <code>npm i clip-pal</code>. Below: every
           emote on demand; further down, the walking guide and the standing

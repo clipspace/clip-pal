@@ -95,6 +95,31 @@
 .clip-pal-bubble.is-left { transform-origin: bottom right; }
 .clip-pal-bubble.is-right { transform-origin: bottom left; }
 .clip-pal-bubble.is-center { transform-origin: bottom center; }
+/* hanging below him: it grows downward and the tail points up */
+.clip-pal-bubble-wrap.is-below {
+  bottom: auto;
+  top: 100%;
+  margin-bottom: 0;
+  margin-top: 0.75rem;
+}
+.clip-pal-bubble.is-below.is-left { transform-origin: top right; }
+.clip-pal-bubble.is-below.is-right { transform-origin: top left; }
+.clip-pal-bubble.is-below.is-left .clip-pal-bubble-box {
+  border-bottom-right-radius: var(--_pal-bubble-radius);
+  border-top-right-radius: 0.375rem;
+}
+.clip-pal-bubble.is-below.is-right .clip-pal-bubble-box {
+  border-bottom-left-radius: var(--_pal-bubble-radius);
+  border-top-left-radius: 0.375rem;
+}
+.clip-pal-bubble.is-below .clip-pal-tail {
+  bottom: auto;
+  top: -7px;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 1px solid var(--_pal-bubble-border);
+  border-top: 1px solid var(--_pal-bubble-border);
+}
 /* the box animates its size, so it morphs smoothly from the little typing
    bubble into the full line */
 .clip-pal-bubble-box {
